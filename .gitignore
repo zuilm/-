@@ -1,0 +1,4 @@
+# Local exports can contain resumes, preferences, and API keys.
+*.json
+!manifest.json
+*.zip

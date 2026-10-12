@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 岗位匹配 · 设置</title><link rel="stylesheet" href="ai-options.css"></head>
+<body>
+<main>
+  <header><span class="eyebrow">AI 岗位匹配</span><h1>让下一份工作，更适合你。</h1><p>填写简历与求职偏好，在 BOSS 职位页查看匹配理由、能力差距和待确认事项。</p></header>
+  <form id="config-form">
+    <section>
+      <div class="section-head"><h2>01 · 你的经历</h2><label class="file-label">导入 TXT / Markdown<input id="resume-file" type="file" accept=".txt,.md,text/plain,text/markdown"></label></div>
+      <label for="resume">简历正文 <span>50–20000 字符</span></label>
+      <textarea id="resume" rows="13" minlength="50" maxlength="20000" required placeholder="粘贴教育背景、工作经历、项目和技能。PDF / Word 简历可先复制正文到这里，无需姓名、电话或邮箱。"></textarea>
+      <label for="preferences">求职偏好 <span>区分必须满足与加分项</span></label>
+      <textarea id="preferences" rows="4" maxlength="4000" placeholder="例如：必须在杭州或远程，期望月薪 20k 以上；优先前端开发、B 端产品；不考虑外包。"></textarea>
+    </section>
+    <section>
+      <h2>02 · 模型服务</h2>
+      <p class="note">支持 OpenAI 兼容的 Chat Completions 接口。点击分析时，简历、偏好和岗位内容会发送到你配置的服务；API Key 保存在本机扩展存储中。</p>
+      <label for="endpoint">AccSpark 接口地址</label><input id="endpoint" type="url" required value="https://www.accspark.cn/v1/chat/completions" placeholder="https://www.accspark.cn/v1 或 /v1/chat/completions">
+      <div class="grid"><div><label for="model">模型名称</label><input id="model" required maxlength="160" placeholder="填写服务商提供的模型 ID"></div><div><label for="api-key">API Key</label><input id="api-key" type="password" required autocomplete="off" maxlength="4096" placeholder="仅用于你配置的模型服务"></div></div>
+      <div class="grid"><div><label for="threshold">优先查看的最低分数</label><input id="threshold" type="number" min="0" max="100" value="70" required></div><div><label for="batch-limit">每批最多分析岗位数</label><input id="batch-limit" type="number" min="1" max="50" value="20" required></div></div>
+      <p class="note">已预填 AccSpark 的 OpenAI 兼容地址。填写 `/v1` 时会自动补全为 `/v1/chat/completions`。每个未缓存岗位会调用一次模型接口，费用由服务商计收。</p>
+    </section>
+    <section>
+      <h2>03 · 本机配置文件</h2>
+      <p class="note">保存设置会写入 Chrome 扩展的本机存储。JSON 文件用于备份或迁移；导入后请核对表单并再次保存。导出文件会明文包含简历、偏好和 API Key。</p>
+      <div class="actions" style="flex-wrap:wrap"><button type="button" class="secondary" id="import-config">导入本机 JSON</button><button type="button" class="secondary" id="export-config">导出本机 JSON</button></div>
+      <input id="config-file" type="file" accept=".json,application/json" hidden>
+    </section>
+    <footer><div class="actions"><button type="submit" id="save">保存设置</button><button type="button" class="secondary" id="clear">清除全部 AI 数据</button></div><p id="status" role="status" aria-live="polite">保存后，回到 BOSS 职位列表点击「AI 筛岗位」。</p></footer>
+  </form>
+</main><script type="module" src="js/ai-options.js"></script>
+</body></html>

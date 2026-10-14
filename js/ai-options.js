@@ -1,4 +1,4 @@
-import { CONFIG_KEY, DEFAULT_ENDPOINT, validateConfig } from './ai-model.js';
+import { CONFIG_KEY, DEFAULT_ENDPOINT, validateConfig, preferenceItems } from './ai-model.js';
 import { createConfigFile, parseConfigFile } from './ai-config-file.js';
 const $ = id => document.getElementById(id);
 const fields = { endpoint:'endpoint', model:'model', apiKey:'api-key', resume:'resume', preferences:'preferences', threshold:'threshold', batchLimit:'batch-limit' };
@@ -26,7 +26,7 @@ $('config-form').addEventListener('submit', async event => {
     const granted = await chrome.permissions.request({ origins: [new URL(config.endpoint).origin + '/*'] });
     if (!granted) throw new Error('未获得该模型服务的访问权限，设置尚未保存。');
     await send({ type: 'ai/saveConfig', config });
-    status('已保存。回到 BOSS 职位页，打开「AI 筛岗位」开始分析。');
+    status(`已保存，求职偏好 ${preferenceItems(config.preferences).length} 条。回到 BOSS 职位页重新分析岗位，使新偏好生效。`);
   } catch (error) { status(error.message, true); }
   finally { $('save').disabled = false; }
 });

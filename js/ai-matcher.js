@@ -46,7 +46,7 @@
   }
   const isPriority = row => row.result.score >= threshold && !row.result.hard_conflicts.length;
   function selectablePriorityRows() {
-    return results.filter(row => isPriority(row) && row.job.scope === 'detail' && jobKey(row.job) && !row.application);
+    return results.filter(row => isPriority(row) && row.result.preferenceReviewComplete !== false && row.job.scope === 'detail' && jobKey(row.job) && !row.application);
   }
   function selectedRows() {
     return results.filter(row => selectedJobs.has(jobKey(row.job)) && !row.application &&
@@ -68,7 +68,7 @@
     $('select-all-priority').disabled = running || contextInvalidated || !$('only-priority').checked || eligible.length === 0;
     $('select-all-priority').textContent = allEligibleSelected ? `取消全选（${eligible.length}）` : `全选适配岗位（${eligible.length}）`;
     $('select-all-hint').textContent = $('only-priority').checked
-      ? '全选只包含达到门槛、无明确冲突且尚未投递的完整 JD 岗位。'
+      ? '全选只包含达到门槛、无明确冲突、偏好已核对且尚未投递的完整 JD 岗位。'
       : '先勾选上方的「仅看达到门槛且无明确冲突」。';
   }
   function togglePrioritySelection() {
@@ -212,6 +212,16 @@
       evidenceBlock('匹配点', row.result.matches, details);
       evidenceBlock('能力差距', row.result.gaps, details);
       evidenceBlock('明确冲突', row.result.hard_conflicts, details);
+      if (row.result.preference_checks?.length) {
+        details.append(element('h4', '求职偏好逐条核对'));
+        const ul = element('ul');
+        for (const check of row.result.preference_checks) {
+          const kind = check.kind === 'must' ? '必须' : '加分';
+          const status = { match:'符合', conflict:'冲突', unknown:'待确认' }[check.status];
+          ul.append(element('li', `${kind} · ${status}：${check.preference}${check.job_evidence ? '（岗位原文：' + check.job_evidence + '）' : ''}`));
+        }
+        details.append(ul);
+      }
       if (row.result.unknowns.length) {
         details.append(element('h4', '待确认'));
         const ul = element('ul');

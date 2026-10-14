@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI 岗位匹配",
-  "version": "1.3.5.17",
+  "version": "1.3.5.18",
   "description": "根据简历和求职偏好分析 BOSS 直聘岗位，并可按匹配结果自动沟通。",
   "background": {
     "service_worker": "background.js",

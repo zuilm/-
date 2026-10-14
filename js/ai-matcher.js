@@ -46,7 +46,7 @@
   }
   const isPriority = row => row.result.score >= threshold && !row.result.hard_conflicts.length;
   function selectablePriorityRows() {
-    return results.filter(row => isPriority(row) && row.result.preferenceReviewComplete !== false && row.job.scope === 'detail' && jobKey(row.job) && !row.application);
+    return results.filter(row => isPriority(row) && row.job.scope === 'detail' && jobKey(row.job) && !row.application);
   }
   function selectedRows() {
     return results.filter(row => selectedJobs.has(jobKey(row.job)) && !row.application &&
@@ -55,6 +55,7 @@
   function updateSelection() {
     const chosen = selectedRows();
     const eligible = selectablePriorityRows();
+    const pendingPreferences = eligible.filter(row => row.result.preferenceReviewComplete === false).length;
     const allEligibleSelected = eligible.length > 0 && selectedJobs.size === eligible.length && eligible.every(row => selectedJobs.has(jobKey(row.job)));
     const hiddenSelected = $('only-priority').checked
       ? results.filter(row => selectedJobs.has(jobKey(row.job)) && !row.application && !isPriority(row)).length
@@ -68,18 +69,19 @@
     $('select-all-priority').disabled = running || contextInvalidated || !$('only-priority').checked || eligible.length === 0;
     $('select-all-priority').textContent = allEligibleSelected ? `取消全选（${eligible.length}）` : `全选适配岗位（${eligible.length}）`;
     $('select-all-hint').textContent = $('only-priority').checked
-      ? '全选只包含达到门槛、无明确冲突、偏好已核对且尚未投递的完整 JD 岗位。'
+      ? `全选当前筛选下可投递的岗位。${pendingPreferences ? `其中 ${pendingPreferences} 条求职偏好待确认，请先核对。` : ''}`
       : '先勾选上方的「仅看达到门槛且无明确冲突」。';
   }
   function togglePrioritySelection() {
     if (running || contextInvalidated || !$('only-priority').checked) return;
     const eligible = selectablePriorityRows();
     if (!eligible.length) return;
+    const pendingPreferences = eligible.filter(row => row.result.preferenceReviewComplete === false).length;
     const keys = eligible.map(row => jobKey(row.job));
     const exactSelection = selectedJobs.size === keys.length && keys.every(key => selectedJobs.has(key));
     selectedJobs = exactSelection ? new Set() : new Set(keys);
     render();
-    setStatus(exactSelection ? '已取消勾选适配岗位。' : `已全选 ${keys.length} 个适配岗位；可点击左侧「一键投递已勾选岗位」。`);
+    setStatus(exactSelection ? '已取消勾选适配岗位。' : `已全选 ${keys.length} 个岗位${pendingPreferences ? `，其中 ${pendingPreferences} 个求职偏好待确认` : ''}；可点击左侧「一键投递已勾选岗位」。`);
   }
   function appendLoadedJobs(limit, jobs, seen) {
     for (const card of document.querySelectorAll('li.job-card-box')) {
